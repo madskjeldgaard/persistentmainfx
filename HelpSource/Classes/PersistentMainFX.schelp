@@ -1,0 +1,55 @@
+TITLE:: PersistentMainFX
+summary:: Add a synthdef to the main output of SuperCollider
+categories:: Extensions
+related:: Classes/Quarks
+
+DESCRIPTION::
+
+This class enables all it's subclasses to create a "persistent" effect synth at the main output of SuperCollider. When the user presses command period to stop the sound, a new synth is automatically spawned at the output again.
+
+A typical usage for this is adding an output limiter or DC effect to protect the user/speakers.
+
+NOTE::This is a meta class that should not be used directly but may instead be inherited by a sub class that inherits it's functionality and implements it's own *synthFunc class method, see below.::
+
+EXAMPLES::
+
+code::
+// Create a high pass filter main effect
+
+/*
+
+// In a class file:
+MainHPF : PersistentMainFX{
+  *synthFunc{
+    ^{|bus=0, freq=50|
+
+      // input
+      var input = In.ar(bus, numChans);
+
+      // Do processing
+      var sig = HPF.ar(input, freq);
+
+      ReplaceOut.ar(bus: bus,  channelsArray: sig);
+    };
+
+  }
+}
+
+*/
+
+// Play some sound
+play{PinkNoise.ar(0.125)!2};
+
+// Add new hpf effect
+MainHPF.new();
+
+// See the effect sitting there:
+s.plotTree;
+
+// Try pressing command/ctrl period to stop all sound, and keep an eye on the plot tree and post window (yes, it respawns)
+CmdPeriod.run;
+
+// Change some parameters
+MainHPF.set(\freq, 950)
+
+::
