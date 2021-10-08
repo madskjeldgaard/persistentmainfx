@@ -4,10 +4,12 @@ This package contains a class that enables all it's subclasses to create a "pers
 
 The class it contains (`PersistentMainFX`) is not used directly but is inherited by a sub class where you implement your synth function.
 
-Example usage:
+## Example usage
 
+
+First, create a class file where you inherit the PersistentMainFX class and implement a synthFunc:
 ```
-// In a class file:
+// In a class file, eg MainHPF.sc
 MainHPF : PersistentMainFX{
   *synthFunc{
     ^{|bus=0, freq=50|
@@ -25,7 +27,7 @@ MainHPF : PersistentMainFX{
 }
 ```
 
-And then the usage of your new high pass filter class in action:
+And then the try out your new high pass filter class in action after a quick recompile and reboot:
 
 ```
 // Play some sound
