@@ -4,6 +4,7 @@ PersistentMainFX {
   classvar <enabled=false;
   classvar <synthdefName;
   classvar <>addAfterNode;
+  classvar <synthArgs;
 
   *new {
     ^this.init();
@@ -12,6 +13,7 @@ PersistentMainFX {
   *init {|addAfter=1|
     addAfterNode=addAfter;
     numChans = Server.local.options.numOutputBusChannels;
+    synthArgs = ();
 
     if(Server.local.hasBooted.not, {
       "%: Server is not booted. Won't do anything until it has booted".format(this.name).warn
@@ -48,11 +50,9 @@ PersistentMainFX {
       this.addMessage();
 
       forkIfNeeded{
-        var synthArgs = [\bus, 0];
-
         Server.local.sync;
 
-        synth = Synth.after(addAfterNode, synthdefName, synthArgs);
+        synth = Synth.after(addAfterNode, synthdefName, synthArgs.asArgsArray ? []);
       }
 
     }
@@ -64,6 +64,12 @@ PersistentMainFX {
   }
 
   *set{|...args|
+
+    // Store arguments in dict so that they are reused when the synth is respawned after cmd-period
+    args.asDict.keysValuesDo{|inKey, inVal|
+      synthArgs.put(inKey, inVal)
+    };
+
     synth.set(*args)
   }
 
