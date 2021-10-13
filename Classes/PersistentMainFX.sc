@@ -37,6 +37,7 @@ PersistentMainFX {
           ServerTree.add(this.treeFunc, Server.local);
           this.treeFunc.value;
           enabled = true;
+          this.afterSynthInit();
         }, { "PersistentMainFX % already setup and enabled!".format(this.name).warn});
       }
     }
@@ -44,6 +45,8 @@ PersistentMainFX {
 
   // Use this to load buffers or prepare other resources before adding synths
   *prepareResources{}
+
+  *afterSynthInit{}
 
   *treeFunc{
     ^{
