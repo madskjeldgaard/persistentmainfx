@@ -3,12 +3,14 @@ PersistentMainFX {
   classvar <numChans;
   classvar <enabled=false;
   classvar <synthdefName;
+  classvar <>addAfterNode;
 
   *new {
     ^this.init();
   }
 
-  *init {
+  *init {|addAfter=1|
+    addAfterNode=addAfter;
     numChans = Server.local.options.numOutputBusChannels;
 
     if(Server.local.hasBooted.not, {
@@ -50,7 +52,7 @@ PersistentMainFX {
 
         Server.local.sync;
 
-        synth = Synth.after(1, synthdefName, synthArgs);
+        synth = Synth.after(addAfterNode, synthdefName, synthArgs);
       }
 
     }
