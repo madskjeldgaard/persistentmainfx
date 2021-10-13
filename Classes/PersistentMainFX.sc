@@ -5,15 +5,23 @@ PersistentMainFX {
   classvar <synthdefName;
   classvar <>addAfterNode;
   classvar <synthArgs;
+  classvar <func;
+  classvar <>forceRebuild=false;
 
   *new {
     ^this.init();
+  }
+
+  *rebuild{|...args|
+    forceRebuild = true;
+    this.init(*args);
   }
 
   *init {|addAfter=1|
     addAfterNode=addAfter;
     numChans = Server.local.options.numOutputBusChannels;
     synthArgs = ();
+    func = this.treeFunc;
 
     if(Server.local.hasBooted.not, {
       "%: Server is not booted. Won't do anything until it has booted".format(this.name).warn
@@ -32,12 +40,13 @@ PersistentMainFX {
         this.addSynthDef();
 
         Server.local.sync;
-        if(enabled.not,{
+        if(enabled.not or: { forceRebuild },{
           // This will respawn the synth on hardstop/cmd-period. Inspired by SafetyNet
-          ServerTree.add(this.treeFunc, Server.local);
-          this.treeFunc.value;
+          ServerTree.add(func, Server.local);
+          func.value;
           enabled = true;
           this.afterSynthInit();
+          forceRebuild = false; // Only rebuild once
         }, { "PersistentMainFX % already setup and enabled!".format(this.name).warn});
       }
     }
