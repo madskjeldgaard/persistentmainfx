@@ -3,7 +3,9 @@
   summary: "Add a synthdef to the main output of SuperCollider",
   version: "0.001",
   schelp: "PersistentMainFX.schelp",
-  dependencies: nil,
+  dependencies: [
+	  "https://github.com/scztt/Singleton.quark",
+  ],
   license: "GNU GPL v3.0",
   copyright: "madskjeldgaard",
   ext_dependency: nil,

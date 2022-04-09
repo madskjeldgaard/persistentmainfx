@@ -1,25 +1,24 @@
-PersistentMainFX {
-  classvar <synth;
-  classvar <numChans;
-  classvar <enabled=false;
-  classvar <synthdefName;
-  classvar <>addAfterNode;
-  classvar <synthArgs;
-  classvar <func;
-  classvar <>forceRebuild=false;
+PersistentMainFX : Singleton {
+  var <synth;
+  var <>numChans;
+  var <enabled=false;
+  var <synthdefName;
+  var <>addAfterNode;
+  var <synthArgs;
+  var <func;
+  var <>forceRebuild=false;
 
-  *new {
-    ^this.init();
-  }
-
-  *rebuild{|...args|
+  rebuild{|...args|
     forceRebuild = true;
-    this.init(*args);
+    this.setArgs(*args);
   }
 
-  *init {|addAfter=1|
-    addAfterNode=addAfter;
-    numChans = Server.local.options.numOutputBusChannels;
+  set{|numChansOut, addAfter=1|
+      addAfterNode = addAfter;
+      numChans = numChansOut ? numChans ? Server.local.options.numOutputBusChannels;
+  }
+
+  init {
     synthArgs = ();
     func = this.treeFunc;
 
@@ -40,7 +39,7 @@ PersistentMainFX {
         this.addSynthDef();
 
         Server.local.sync;
-        if(enabled.not or: { forceRebuild },{
+        if(enabled.not || forceRebuild,{
           // This will respawn the synth on hardstop/cmd-period. Inspired by SafetyNet
           ServerTree.add(func, Server.local);
           func.value;
@@ -53,11 +52,11 @@ PersistentMainFX {
   }
 
   // Use this to load buffers or prepare other resources before adding synths
-  *prepareResources{}
+  prepareResources{}
 
-  *afterSynthInit{}
+  afterSynthInit{}
 
-  *treeFunc{
+  treeFunc{
     ^{
       this.addMessage();
 
@@ -71,11 +70,11 @@ PersistentMainFX {
 
   }
 
-  *addMessage{
+  addMessage{
     "Adding % to main output".format(this.name).postln;
   }
 
-  *set{|...args|
+  setArgs{|...args|
 
     // Store arguments in dict so that they are reused when the synth is respawned after cmd-period
     args.asDict.keysValuesDo{|inKey, inVal|
@@ -85,18 +84,18 @@ PersistentMainFX {
     synth.set(*args)
   }
 
-  *map{|...args|
+  map{|...args|
     synth.map(*args)
   }
 
-  *addSynthDef{
-    synthdefName = (this.name.toLower.asString ++ numChans).asSymbol;
+  addSynthDef{
+    synthdefName = (this.class.name.toLower.asString ++"_" ++ this.name ++ numChans).asSymbol;
 
     SynthDef.new(synthdefName, this.synthFunc()).add;
 
   }
 
-  *synthFunc{
+  synthFunc{
     ^{|bus=0|
 
       // input
