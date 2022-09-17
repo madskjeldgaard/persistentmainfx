@@ -90,7 +90,7 @@ PersistentMainFX {
   }
 
   *addSynthDef{
-    synthdefName = (this.name.toLower.asString ++ numChans).asSymbol;
+    synthdefName = (this.name.asString.toLower ++ numChans).asSymbol;
 
     SynthDef.new(synthdefName, this.synthFunc()).add;
 
